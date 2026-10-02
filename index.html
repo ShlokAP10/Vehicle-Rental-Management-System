@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+  <title>Vehicle Rental Management System</title>
+
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <h1>Vehicle Rental Management System</h1>
+
+  <p class="subtitle">
+    Basic Vehicle Rental Module
+  </p>
+
+
+  <div class="container">
+
+
+    <!-- Rent Vehicle -->
+
+    <div class="box">
+
+      <h2>Rent a Vehicle</h2>
+
+      <input type="text" id="customer" placeholder="Customer Name">
+
+      <select id="vehicle">
+
+        <option value="">
+          Select Vehicle
+        </option>
+
+        <option value="Honda City">
+          Honda City
+        </option>
+
+        <option value="Swift">
+          Swift
+        </option>
+
+      </select>
+
+      <input type="number" id="days" placeholder="Rental Days" min="1">
+
+      <button onclick="rentVehicle()">
+        Rent Vehicle
+      </button>
+
+      <p id="message"></p>
+
+    </div>
+
+
+    <!-- Vehicle List -->
+
+    <div class="box">
+
+      <h2>Vehicle List</h2>
+
+      <table>
+
+        <tr>
+          <th>ID</th>
+          <th>Vehicle</th>
+          <th>Number</th>
+          <th>Rent / Day</th>
+          <th>Status</th>
+        </tr>
+
+
+        <tr>
+          <td>101</td>
+          <td>Honda City</td>
+          <td>MH01AB1234</td>
+          <td>₹2500</td>
+          <td id="hondaStatus" class="available">
+            Available
+          </td>
+        </tr>
+
+
+        <tr>
+          <td>102</td>
+          <td>Swift</td>
+          <td>MH02CD5678</td>
+          <td>₹1500</td>
+          <td id="swiftStatus" class="available">
+            Available
+          </td>
+        </tr>
+
+      </table>
+
+
+      <p class="total">
+        Total Vehicles: <b>2</b>
+      </p>
+
+    </div>
+
+
+    <!-- Rental Details -->
+
+    <div class="box">
+
+      <h2>Rental Details</h2>
+
+      <p id="rentalInfo">
+        No vehicle rented yet.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <script src="script.js"></script>
+
+</body>
+
+</html>
