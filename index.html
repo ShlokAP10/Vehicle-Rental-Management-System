@@ -1,196 +1,543 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Motivo - Vehicle Rental</title>
+
+    <title>Motivo | Vehicle Rental Management</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header class="navbar">
-    <h2>Motivo</h2>
+    <!-- ================= NAVBAR ================= -->
 
-    <nav>
-        <a href="#home">Home</a>
-        <a href="#vehicles">Vehicles</a>
-        <a href="#rent">Rent</a>
-        <a href="#records">Records</a>
-    </nav>
-</header>
+    <header class="navbar">
 
+        <a href="#home" class="logo">
+            <span>M</span>
+            motivo
+        </a>
 
-<main>
+        <nav>
+            <a href="#vehicles">Vehicles</a>
+            <a href="#rent">Rent</a>
+            <a href="#records">Records</a>
+        </nav>
 
-<!-- HOME -->
-<section class="hero" id="home">
-    <h1>Simple Vehicle Rental</h1>
-    <p>Choose a vehicle, rent it and manage your bookings easily.</p>
+        <a href="#rent" class="nav-btn">
+            Rent now
+        </a>
 
-    <a href="#vehicles" class="primary-btn">View Vehicles</a>
-</section>
-
-
-<!-- STATISTICS -->
-<section class="stats">
-    <div>
-        <p>Total Vehicles</p>
-        <h2 id="totalVehicles">0</h2>
-    </div>
-
-    <div>
-        <p>Available</p>
-        <h2 id="availableVehicles">0</h2>
-    </div>
-
-    <div>
-        <p>Active Rentals</p>
-        <h2 id="activeRentals">0</h2>
-    </div>
-
-    <div>
-        <p>Revenue</p>
-        <h2 id="totalRevenue">₹0</h2>
-    </div>
-</section>
+    </header>
 
 
-<!-- VEHICLES -->
-<section class="section" id="vehicles">
+    <main>
 
-    <h2>Choose Your Vehicle</h2>
-    <p>Cars, SUVs and bikes available for rent.</p>
+        <!-- ================= HERO ================= -->
 
-    <div class="filters">
-        <button onclick="setFilter('All', this)">All</button>
-        <button onclick="setFilter('Car', this)">Cars</button>
-        <button onclick="setFilter('SUV', this)">SUVs</button>
-        <button onclick="setFilter('Bike', this)">Bikes</button>
-    </div>
+        <section class="hero" id="home">
 
-    <input
-        type="text"
-        id="searchInput"
-        placeholder="Search vehicle..."
-        oninput="displayVehicles()">
+            <div class="hero-content">
 
-    <div id="vehicleGrid" class="vehicle-grid"></div>
+                <p class="eyebrow">
+                    VEHICLE RENTAL MANAGEMENT
+                </p>
 
-</section>
+                <h1>
+                    Simple rentals.
+                    <br>
+                    <em>Better journeys.</em>
+                </h1>
 
+                <p class="hero-description">
+                    Choose a vehicle, select your rental period,
+                    calculate the price and manage your booking
+                    from one simple platform.
+                </p>
 
-<!-- RENT VEHICLE -->
-<section class="rent-section" id="rent">
+                <div class="hero-actions">
 
-    <h2>Rent a Vehicle</h2>
+                    <a href="#vehicles" class="primary-btn">
+                        Explore vehicles
+                    </a>
 
-    <div class="rental-form">
+                    <a href="#rent" class="text-btn">
+                        Start a rental →
+                    </a>
 
-        <label>Customer Name</label>
-        <input
-            type="text"
-            id="customer"
-            placeholder="Enter your name">
+                </div>
 
-        <label>Phone Number</label>
-        <input
-            type="tel"
-            id="phone"
-            maxlength="10"
-            placeholder="Enter phone number">
-
-        <label>Vehicle</label>
-        <select id="vehicle" onchange="calculatePreview()">
-            <option value="">Select vehicle</option>
-        </select>
-
-        <label>Rental Days</label>
-        <input
-            type="number"
-            id="days"
-            value="1"
-            min="1"
-            max="30"
-            oninput="calculatePreview()">
-
-        <button onclick="rentVehicle()">
-            Confirm Rental
-        </button>
-
-        <p id="message"></p>
-
-    </div>
+            </div>
 
 
-    <!-- SUMMARY -->
-    <div class="summary">
+            <div class="hero-visual">
 
-        <h3>Rental Summary</h3>
+                <div class="hero-label">
+                    <span>01</span>
+                    <span>FLEET</span>
+                </div>
+
+                <div class="hero-car">
+
+                    <div class="hero-car-roof"></div>
+
+                    <div class="hero-car-window"></div>
+
+                    <div class="hero-car-body">
+
+                        <div class="hero-light"></div>
+
+                        <div class="hero-door"></div>
+
+                    </div>
+
+                    <div class="hero-wheel wheel-left"></div>
+                    <div class="hero-wheel wheel-right"></div>
+
+                </div>
+
+                <div class="hero-bottom">
+
+                    <strong>Ready to drive</strong>
+
+                    <span>
+                        Cars · SUVs · Bikes
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= STATISTICS ================= -->
+
+        <section class="stats">
+
+            <div class="stat-box">
+
+                <span>Total vehicles</span>
+
+                <strong id="totalVehicles">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>Available now</span>
+
+                <strong id="availableVehicles">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>Active rentals</span>
+
+                <strong id="activeRentals">
+                    0
+                </strong>
+
+            </div>
+
+
+            <div class="stat-box">
+
+                <span>Total revenue</span>
+
+                <strong id="totalRevenue">
+                    ₹0
+                </strong>
+
+            </div>
+
+        </section>
+
+
+
+        <section class="section" id="vehicles">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        OUR FLEET
+                    </p>
+
+                    <h2>
+                        Choose your vehicle.
+                    </h2>
+
+                </div>
+
+                <p>
+                    Reliable vehicles with simple,
+                    transparent daily pricing.
+                </p>
+
+            </div>
+
+
+
+
+            <div class="vehicle-toolbar">
+
+                <div class="filters">
+
+                    <button
+                        class="filter active"
+                        onclick="setFilter('All', this)">
+                        All
+                    </button>
+
+                    <button
+                        class="filter"
+                        onclick="setFilter('Car', this)">
+                        Cars
+                    </button>
+
+                    <button
+                        class="filter"
+                        onclick="setFilter('SUV', this)">
+                        SUVs
+                    </button>
+
+                    <button
+                        class="filter"
+                        onclick="setFilter('Bike', this)">
+                        Bikes
+                    </button>
+
+                </div>
+
+
+                <div class="search-box">
+
+                    <input
+                        type="text"
+                        id="searchInput"
+                        placeholder="Search vehicle..."
+                        oninput="displayVehicles()">
+
+                </div>
+
+            </div>
+
+
+
+
+            <div
+                class="vehicle-grid"
+                id="vehicleGrid">
+            </div>
+
+        </section>
+
+
+
+        <section class="rent-section" id="rent">
+
+            <div class="section rent-container">
+
+                <div class="section-heading light-heading">
+
+                    <div>
+
+                        <p class="eyebrow">
+                            BOOK A VEHICLE
+                        </p>
+
+                        <h2>
+                            Ready when you are.
+                        </h2>
+
+                    </div>
+
+                    <p>
+                        Enter the customer details and
+                        confirm your rental.
+                    </p>
+
+                </div>
+
+
+                <div class="rental-layout">
+
+                    <!-- FORM -->
+
+                    <div class="form-card">
+
+                        <div class="form-title">
+
+                            <h3>
+                                Rental details
+                            </h3>
+
+                            <span>
+                                Required
+                            </span>
+
+                        </div>
+
+
+                        <label for="customer">
+                            Customer name
+                        </label>
+
+                        <input
+                            type="text"
+                            id="customer"
+                            placeholder="Enter full name">
+
+
+                        <label for="phone">
+                            Phone number
+                        </label>
+
+                        <input
+                            type="tel"
+                            id="phone"
+                            maxlength="10"
+                            placeholder="Enter 10-digit phone number">
+
+
+                        <div class="form-row">
+
+                            <div>
+
+                                <label for="vehicle">
+                                    Vehicle
+                                </label>
+
+                                <select id="vehicle"
+                                    onchange="calculatePreview()">
+
+                                    <option value="">
+                                        Select vehicle
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            <div>
+
+                                <label for="days">
+                                    Rental days
+                                </label>
+
+                                <input
+                                    type="number"
+                                    id="days"
+                                    min="1"
+                                    max="30"
+                                    value="1"
+                                    oninput="calculatePreview()">
+
+                            </div>
+
+                        </div>
+
+
+                        <button
+                            class="confirm-btn"
+                            onclick="rentVehicle()">
+
+                            Confirm rental
+
+                        </button>
+
+
+                        <p
+                            id="message"
+                            class="message">
+                        </p>
+
+                    </div>
+
+
+
+                    <div class="summary-card">
+
+                        <p class="eyebrow">
+                            RENTAL SUMMARY
+                        </p>
+
+
+                        <div class="summary-row">
+
+                            <span>
+                                Vehicle
+                            </span>
+
+                            <strong id="summaryVehicle">
+                                —
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>
+                                Daily rate
+                            </span>
+
+                            <strong id="summaryRate">
+                                ₹0
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-row">
+
+                            <span>
+                                Duration
+                            </span>
+
+                            <strong id="summaryDays">
+                                1 day
+                            </strong>
+
+                        </div>
+
+
+                        <div class="summary-line"></div>
+
+
+                        <div class="summary-total">
+
+                            <span>
+                                Total
+                            </span>
+
+                            <strong id="previewPrice">
+                                ₹0
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+
+        <section class="section" id="records">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <p class="eyebrow">
+                        MANAGEMENT
+                    </p>
+
+                    <h2>
+                        Rental records.
+                    </h2>
+
+                </div>
+
+                <p>
+                    Track active bookings and return
+                    vehicles when completed.
+                </p>
+
+            </div>
+
+
+            <div class="table-container">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+
+                            <th>ID</th>
+
+                            <th>Customer</th>
+
+                            <th>Vehicle</th>
+
+                            <th>Days</th>
+
+                            <th>Total</th>
+
+                            <th>Status</th>
+
+                            <th>Action</th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody id="rentalTable">
+
+                        <tr>
+
+                            <td
+                                colspan="7"
+                                class="empty-row">
+
+                                No rental records yet.
+
+                            </td>
+
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+
+
+    <footer>
+
+        <div class="footer-logo">
+
+            <span>M</span>
+            motivo
+
+        </div>
 
         <p>
-            Vehicle:
-            <strong id="summaryVehicle">—</strong>
+            Vehicle Rental Management System
         </p>
 
-        <p>
-            Daily Rate:
-            <strong id="summaryRate">₹0</strong>
-        </p>
-
-        <p>
-            Days:
-            <strong id="summaryDays">1 day</strong>
-        </p>
-
-        <h2 id="previewPrice">₹0</h2>
-
-    </div>
-
-</section>
+    </footer>
 
 
-<!-- RENTAL RECORDS -->
-<section class="section" id="records">
-
-    <h2>Rental Records</h2>
-
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Customer</th>
-                <th>Vehicle</th>
-                <th>Days</th>
-                <th>Total</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-
-        <tbody id="rentalTable">
-            <tr>
-                <td colspan="7">
-                    No rental records yet.
-                </td>
-            </tr>
-        </tbody>
-    </table>
-
-</section>
-
-</main>
-
-
-<footer>
-    <h3>Motivo</h3>
-    <p>Vehicle Rental Management System</p>
-</footer>
-
-
-<script src="script.js"></script>
+    <script src="script.js"></script>
 
 </body>
+
 </html>
-```
