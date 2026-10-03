@@ -1,6 +1,6 @@
-/* =========================================
+/* =========================
    VEHICLE DATA
-========================================= */
+========================= */
 
 const vehicles = [
 
@@ -10,8 +10,7 @@ const vehicles = [
         type: "Car",
         number: "MH01AB1234",
         price: 2500,
-        color: "#687064",
-        available: true
+        image: "https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?auto=format&fit=crop&w=900&q=80"
     },
 
     {
@@ -20,28 +19,25 @@ const vehicles = [
         type: "Car",
         number: "MH02CD5678",
         price: 1500,
-        color: "#8A8075",
-        available: true
+        image: "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=900&q=80"
     },
 
     {
         id: 103,
-        name: "Toyota Fortuner",
+        name: "Hyundai Creta",
         type: "SUV",
         number: "MH03EF9012",
-        price: 3500,
-        color: "#5E625B",
-        available: true
+        price: 2200,
+        image: "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=900&q=80"
     },
 
     {
         id: 104,
-        name: "Hyundai Creta",
+        name: "Toyota Fortuner",
         type: "SUV",
         number: "MH04GH3456",
-        price: 2800,
-        color: "#817C70",
-        available: true
+        price: 4000,
+        image: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=900&q=80"
     },
 
     {
@@ -50,8 +46,7 @@ const vehicles = [
         type: "Bike",
         number: "MH05IJ7890",
         price: 900,
-        color: "#4E554C",
-        available: true
+        image: "https://images.unsplash.com/photo-1558981806-ec527fa84c39?auto=format&fit=crop&w=900&q=80"
     },
 
     {
@@ -59,30 +54,72 @@ const vehicles = [
         name: "Yamaha MT-15",
         type: "Bike",
         number: "MH06KL1234",
-        price: 750,
-        color: "#706E65",
-        available: true
+        price: 700,
+        image: "https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=900&q=80"
     }
 
 ];
 
 
-/* =========================================
-   RENTAL DATA
-========================================= */
+/* =========================
+   VARIABLES
+========================= */
 
-const rentals = [];
+let currentFilter = "All";
 
-let rentalNumber = 1;
+let rentals =
+    JSON.parse(localStorage.getItem("motivoRentals")) || [];
 
-let selectedType = "all";
+let nextRentalId =
+    Number(localStorage.getItem("motivoNextRentalId")) || 1001;
 
-let totalRevenue = 0;
+
+/* =========================
+   PAGE LOAD
+========================= */
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    displayVehicles();
+
+    populateVehicleSelect();
+
+    displayRentals();
+
+    updateStats();
+
+    calculatePreview();
+
+});
 
 
-/* =========================================
+/* =========================
+   FILTER
+========================= */
+
+function setFilter(type, button) {
+
+    currentFilter = type;
+
+    const buttons =
+        document.querySelectorAll(".filter");
+
+    buttons.forEach(function (btn) {
+
+        btn.classList.remove("active");
+
+    });
+
+    button.classList.add("active");
+
+    displayVehicles();
+
+}
+
+
+/* =========================
    DISPLAY VEHICLES
-========================================= */
+========================= */
 
 function displayVehicles() {
 
@@ -93,18 +130,26 @@ function displayVehicles() {
         document
             .getElementById("searchInput")
             .value
-            .toLowerCase();
+            .toLowerCase()
+            .trim();
+
 
     grid.innerHTML = "";
 
 
-    for (let i = 0; i < vehicles.length; i++) {
+    let filteredVehicles = vehicles.filter(function (vehicle) {
 
-        const vehicle = vehicles[i];
+        const matchesFilter =
+            currentFilter === "All" ||
+            vehicle.type === currentFilter;
 
 
         const matchesSearch =
             vehicle.name
+                .toLowerCase()
+                .includes(search) ||
+
+            vehicle.type
                 .toLowerCase()
                 .includes(search) ||
 
@@ -113,183 +158,175 @@ function displayVehicles() {
                 .includes(search);
 
 
-        const matchesType =
-            selectedType === "all" ||
-            vehicle.type === selectedType;
+        return matchesFilter && matchesSearch;
+
+    });
 
 
-        if (matchesSearch && matchesType) {
+    if (filteredVehicles.length === 0) {
 
-            createVehicleCard(vehicle, grid);
-        }
+        grid.innerHTML = `
+            <div class="empty-vehicles">
+                No vehicles found.
+            </div>
+        `;
+
+        return;
     }
 
 
-    updateDashboard();
+    filteredVehicles.forEach(function (vehicle) {
 
-    updateVehicleSelect();
-}
-
-
-/* =========================================
-   CREATE VEHICLE CARD
-========================================= */
-
-function createVehicleCard(vehicle, grid) {
-
-    const status =
-        vehicle.available
-            ? "Available"
-            : "Rented";
+        const rented =
+            isVehicleRented(vehicle.id);
 
 
-    const statusClass =
-        vehicle.available
-            ? "available"
-            : "rented";
+        const card =
+            document.createElement("div");
+
+        card.className = "vehicle-card";
 
 
-    grid.innerHTML += `
+        card.innerHTML = `
 
-        <article class="vehicle-card">
+            <div class="vehicle-image">
 
-            <div
-                class="vehicle-image"
-                style="--vehicle-color: ${vehicle.color}"
-            >
+                <img
+                    src="${vehicle.image}"
+                    alt="${vehicle.name}"
+                    loading="lazy">
 
-                <div class="vehicle-wheels">
-                    <span></span>
-                    <span></span>
-                </div>
+                <span class="vehicle-status ${rented ? "rented" : "available"}">
+                    ${rented ? "RENTED" : "AVAILABLE"}
+                </span>
 
             </div>
 
 
             <div class="vehicle-info">
 
-                <div class="vehicle-info-top">
+                <div class="vehicle-top">
 
                     <div>
 
-                        <h3>
+                        <div class="vehicle-name">
                             ${vehicle.name}
-                        </h3>
+                        </div>
 
-                        <p class="vehicle-type">
+                        <div class="vehicle-type">
                             ${vehicle.type}
-                        </p>
+                        </div>
 
                     </div>
 
-
-                    <span class="status ${statusClass}">
-                        ${status}
-                    </span>
-
-                </div>
-
-
-                <p class="vehicle-number">
-                    Registration · ${vehicle.number}
-                </p>
-
-
-                <div class="vehicle-bottom">
 
                     <div class="vehicle-price">
 
                         <strong>
-                            ₹${vehicle.price.toLocaleString("en-IN")}
+                            ₹${vehicle.price}
                         </strong>
 
                         <span>
-                            / day
+                            per day
                         </span>
 
                     </div>
 
+                </div>
+
+
+                <div class="vehicle-meta">
+
+                    <span>
+                        ${vehicle.number}
+                    </span>
 
                     <button
-                        class="rent-small-button"
-                        onclick="selectVehicle(${vehicle.id})"
-                        ${vehicle.available ? "" : "disabled"}
-                    >
-                        ${vehicle.available ? "Rent" : "Rented"}
+                        class="vehicle-rent-btn"
+                        ${rented ? "disabled" : ""}
+                        onclick="selectVehicle(${vehicle.id})">
+
+                        ${rented ? "Unavailable" : "Rent"}
+
                     </button>
 
                 </div>
 
             </div>
+        `;
 
-        </article>
 
-    `;
+        grid.appendChild(card);
+
+    });
+
 }
 
 
-/* =========================================
-   FILTER VEHICLES
-========================================= */
+/* =========================
+   CHECK VEHICLE STATUS
+========================= */
 
-function filterVehicles(type, button) {
+function isVehicleRented(vehicleId) {
 
-    selectedType = type;
+    return rentals.some(function (rental) {
 
+        return (
+            rental.vehicleId === vehicleId &&
+            rental.status === "Active"
+        );
 
-    const buttons =
-        document.querySelectorAll(".filter");
+    });
 
-
-    for (let i = 0; i < buttons.length; i++) {
-
-        buttons[i].classList.remove("active");
-    }
-
-
-    button.classList.add("active");
-
-
-    displayVehicles();
 }
 
 
-/* =========================================
+/* =========================
    FIND VEHICLE
-========================================= */
+========================= */
 
 function findVehicle(id) {
 
-    for (let i = 0; i < vehicles.length; i++) {
+    return vehicles.find(function (vehicle) {
 
-        if (vehicles[i].id === id) {
+        return vehicle.id === id;
 
-            return vehicles[i];
-        }
-    }
+    });
 
-
-    return null;
 }
 
 
-/* =========================================
+/* =========================
    SELECT VEHICLE
-========================================= */
+========================= */
 
 function selectVehicle(id) {
 
-    const vehicle = findVehicle(id);
+    const vehicle =
+        findVehicle(id);
 
 
-    if (!vehicle || !vehicle.available) {
+    if (!vehicle) {
+        return;
+    }
+
+
+    if (isVehicleRented(id)) {
+
+        showMessage(
+            "This vehicle is currently rented.",
+            "error"
+        );
 
         return;
     }
 
 
-    document.getElementById("vehicle").value =
-        vehicle.id;
+    const select =
+        document.getElementById("vehicle");
+
+
+    select.value = id;
 
 
     calculatePreview();
@@ -300,55 +337,42 @@ function selectVehicle(id) {
         .scrollIntoView({
             behavior: "smooth"
         });
+
 }
 
 
-/* =========================================
-   UPDATE VEHICLE DROPDOWN
-========================================= */
+/* =========================
+   POPULATE SELECT
+========================= */
 
-function updateVehicleSelect() {
+function populateVehicleSelect() {
 
     const select =
         document.getElementById("vehicle");
 
 
-    const currentValue =
-        select.value;
+    vehicles.forEach(function (vehicle) {
+
+        const option =
+            document.createElement("option");
 
 
-    select.innerHTML =
-        `<option value="">
-            Select a vehicle
-        </option>`;
+        option.value = vehicle.id;
+
+        option.textContent =
+            `${vehicle.name} — ₹${vehicle.price}/day`;
 
 
-    for (let i = 0; i < vehicles.length; i++) {
+        select.appendChild(option);
 
-        const vehicle = vehicles[i];
+    });
 
-
-        if (vehicle.available) {
-
-            select.innerHTML += `
-
-                <option value="${vehicle.id}">
-                    ${vehicle.name} —
-                    ₹${vehicle.price.toLocaleString("en-IN")}/day
-                </option>
-
-            `;
-        }
-    }
-
-
-    select.value = currentValue;
 }
 
 
-/* =========================================
-   CALCULATE RENTAL PRICE
-========================================= */
+/* =========================
+   PRICE CALCULATION
+========================= */
 
 function calculatePreview() {
 
@@ -361,47 +385,35 @@ function calculatePreview() {
     const days =
         Number(
             document.getElementById("days").value
-        );
-
-
-    const priceElement =
-        document.getElementById("previewPrice");
-
-    const vehicleElement =
-        document.getElementById("summaryVehicle");
-
-    const rateElement =
-        document.getElementById("summaryRate");
-
-    const daysElement =
-        document.getElementById("summaryDays");
-
-
-    if (!vehicleId) {
-
-        vehicleElement.innerText = "—";
-
-        rateElement.innerText = "₹0";
-
-        daysElement.innerText = "1 day";
-
-        priceElement.innerText = "₹0";
-
-        return;
-    }
+        ) || 1;
 
 
     const vehicle =
         findVehicle(vehicleId);
 
 
+    const summaryVehicle =
+        document.getElementById("summaryVehicle");
+
+    const summaryRate =
+        document.getElementById("summaryRate");
+
+    const summaryDays =
+        document.getElementById("summaryDays");
+
+    const previewPrice =
+        document.getElementById("previewPrice");
+
+
     if (!vehicle) {
 
-        return;
-    }
+        summaryVehicle.textContent = "—";
 
+        summaryRate.textContent = "₹0";
 
-    if (days < 1) {
+        summaryDays.textContent = "1 day";
+
+        previewPrice.textContent = "₹0";
 
         return;
     }
@@ -411,29 +423,27 @@ function calculatePreview() {
         vehicle.price * days;
 
 
-    vehicleElement.innerText =
+    summaryVehicle.textContent =
         vehicle.name;
 
 
-    rateElement.innerText =
-        "₹" +
-        vehicle.price.toLocaleString("en-IN");
+    summaryRate.textContent =
+        `₹${vehicle.price}`;
 
 
-    daysElement.innerText =
-        days +
-        (days === 1 ? " day" : " days");
+    summaryDays.textContent =
+        `${days} ${days === 1 ? "day" : "days"}`;
 
 
-    priceElement.innerText =
-        "₹" +
-        total.toLocaleString("en-IN");
+    previewPrice.textContent =
+        `₹${total}`;
+
 }
 
 
-/* =========================================
+/* =========================
    RENT VEHICLE
-========================================= */
+========================= */
 
 function rentVehicle() {
 
@@ -453,32 +463,27 @@ function rentVehicle() {
 
     const vehicleId =
         Number(
-            document.getElementById("vehicle").value
+            document
+                .getElementById("vehicle")
+                .value
         );
 
 
     const days =
         Number(
-            document.getElementById("days").value
+            document
+                .getElementById("days")
+                .value
         );
 
 
-    const message =
-        document.getElementById("message");
+    /* VALIDATION */
 
-
-    /* BASIC VALIDATION */
-
-    if (
-        customer === "" ||
-        phone === "" ||
-        !vehicleId ||
-        !days
-    ) {
+    if (customer.length < 2) {
 
         showMessage(
-            "Please fill in all the required details.",
-            false
+            "Please enter a valid customer name.",
+            "error"
         );
 
         return;
@@ -488,19 +493,30 @@ function rentVehicle() {
     if (!/^[0-9]{10}$/.test(phone)) {
 
         showMessage(
-            "Please enter a valid 10-digit phone number.",
-            false
+            "Phone number must contain 10 digits.",
+            "error"
         );
 
         return;
     }
 
 
-    if (days < 1 || days > 30) {
+    if (!vehicleId) {
 
         showMessage(
-            "Rental duration must be between 1 and 30 days.",
-            false
+            "Please select a vehicle.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (!days || days < 1 || days > 30) {
+
+        showMessage(
+            "Rental period must be between 1 and 30 days.",
+            "error"
         );
 
         return;
@@ -514,26 +530,24 @@ function rentVehicle() {
     if (!vehicle) {
 
         showMessage(
-            "Vehicle could not be found.",
-            false
+            "Vehicle not found.",
+            "error"
         );
 
         return;
     }
 
 
-    if (!vehicle.available) {
+    if (isVehicleRented(vehicleId)) {
 
         showMessage(
             "This vehicle is already rented.",
-            false
+            "error"
         );
 
         return;
     }
 
-
-    /* CALCULATE TOTAL */
 
     const total =
         vehicle.price * days;
@@ -543,30 +557,23 @@ function rentVehicle() {
 
     const rental = {
 
-        id:
-            "R" +
-            String(rentalNumber).padStart(3, "0"),
+        id: nextRentalId,
 
-        customer:
-            customer,
+        customer: customer,
 
-        phone:
-            phone,
+        phone: phone,
 
-        vehicleId:
-            vehicle.id,
+        vehicleId: vehicle.id,
 
-        vehicleName:
-            vehicle.name,
+        vehicleName: vehicle.name,
 
-        days:
-            days,
+        days: days,
 
-        total:
-            total,
+        total: total,
 
-        status:
-            "Active"
+        status: "Active",
+
+        date: new Date().toLocaleDateString("en-IN")
 
     };
 
@@ -574,79 +581,102 @@ function rentVehicle() {
     rentals.push(rental);
 
 
-    rentalNumber++;
+    nextRentalId++;
 
 
-    totalRevenue += total;
+    saveData();
 
-
-    /* VEHICLE BECOMES UNAVAILABLE */
-
-    vehicle.available = false;
-
-
-    showMessage(
-        "Rental confirmed successfully.",
-        true
-    );
-
-
-    /* CLEAR FORM */
-
-    document
-        .getElementById("customer")
-        .value = "";
-
-    document
-        .getElementById("phone")
-        .value = "";
-
-    document
-        .getElementById("vehicle")
-        .value = "";
-
-    document
-        .getElementById("days")
-        .value = 1;
-
-
-    calculatePreview();
 
     displayVehicles();
 
+    populateVehicleSelectRefresh();
+
     displayRentals();
 
-    updateDashboard();
+    updateStats();
+
+
+    showMessage(
+        `Rental confirmed successfully. Rental ID: ${rental.id}`,
+        "success"
+    );
+
+
+    clearForm();
+
 }
 
 
-/* =========================================
-   MESSAGE
-========================================= */
+/* =========================
+   CLEAR FORM
+========================= */
 
-function showMessage(text, success) {
+function clearForm() {
 
-    const message =
-        document.getElementById("message");
+    document.getElementById("customer").value = "";
 
+    document.getElementById("phone").value = "";
 
-    message.innerText = text;
+    document.getElementById("vehicle").value = "";
 
+    document.getElementById("days").value = 1;
 
-    if (success) {
+    calculatePreview();
 
-        message.style.color = "#aeb8a5";
-
-    } else {
-
-        message.style.color = "#d98c82";
-    }
 }
 
 
-/* =========================================
-   DISPLAY RENTAL RECORDS
-========================================= */
+/* =========================
+   REFRESH SELECT
+========================= */
+
+function populateVehicleSelectRefresh() {
+
+    const select =
+        document.getElementById("vehicle");
+
+
+    const selectedValue =
+        select.value;
+
+
+    select.innerHTML = `
+        <option value="">
+            Select vehicle
+        </option>
+    `;
+
+
+    vehicles.forEach(function (vehicle) {
+
+        if (!isVehicleRented(vehicle.id)) {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value = vehicle.id;
+
+
+            option.textContent =
+                `${vehicle.name} — ₹${vehicle.price}/day`;
+
+
+            select.appendChild(option);
+
+        }
+
+    });
+
+
+    select.value = selectedValue;
+
+}
+
+
+/* =========================
+   DISPLAY RENTALS
+========================= */
 
 function displayRentals() {
 
@@ -654,215 +684,263 @@ function displayRentals() {
         document.getElementById("rentalTable");
 
 
+    table.innerHTML = "";
+
+
     if (rentals.length === 0) {
 
         table.innerHTML = `
-
             <tr>
-
-                <td
-                    colspan="7"
-                    class="empty-row"
-                >
+                <td colspan="7" class="empty-row">
                     No rental records yet.
                 </td>
-
             </tr>
-
         `;
 
         return;
     }
 
 
-    table.innerHTML = "";
+    rentals.forEach(function (rental) {
+
+        const row =
+            document.createElement("tr");
 
 
-    for (let i = 0; i < rentals.length; i++) {
+        row.innerHTML = `
 
-        const rental = rentals[i];
+            <td>
+                #${rental.id}
+            </td>
 
+            <td>
+                ${rental.customer}
+            </td>
 
-        let action;
+            <td>
+                ${rental.vehicleName}
+            </td>
 
+            <td>
+                ${rental.days}
+            </td>
 
-        if (rental.status === "Active") {
+            <td>
+                ₹${rental.total}
+            </td>
 
-            action = `
+            <td>
 
-                <button
-                    class="return-button"
-                    onclick="returnVehicle('${rental.id}')"
-                >
-                    Return
-                </button>
+                <span class="status ${
+                    rental.status === "Active"
+                        ? "active"
+                        : "returned"
+                }">
 
-            `;
+                    ${rental.status}
 
-        } else {
-
-            action = `
-                <span class="returned">
-                    Returned
                 </span>
-            `;
-        }
 
+            </td>
 
-        table.innerHTML += `
+            <td>
 
-            <tr>
+                ${
+                    rental.status === "Active"
 
-                <td>
-                    ${rental.id}
-                </td>
+                    ?
 
-                <td>
-                    ${rental.customer}
-                </td>
+                    `
+                    <button
+                        class="return-btn"
+                        onclick="returnVehicle(${rental.id})">
 
-                <td>
-                    ${rental.vehicleName}
-                </td>
+                        Return
 
-                <td>
-                    ${rental.days}
-                </td>
+                    </button>
+                    `
 
-                <td>
-                    ₹${rental.total.toLocaleString("en-IN")}
-                </td>
+                    :
 
-                <td>
+                    `<span>Completed</span>`
+                }
 
-                    <span class="status ${
-                        rental.status === "Active"
-                            ? "rented"
-                            : "available"
-                    }">
-
-                        ${rental.status}
-
-                    </span>
-
-                </td>
-
-                <td>
-                    ${action}
-                </td>
-
-            </tr>
+            </td>
 
         `;
-    }
+
+
+        table.appendChild(row);
+
+    });
+
 }
 
 
-/* =========================================
+/* =========================
    RETURN VEHICLE
-========================================= */
+========================= */
 
 function returnVehicle(rentalId) {
 
-    for (let i = 0; i < rentals.length; i++) {
+    const rental =
+        rentals.find(function (item) {
 
-        const rental = rentals[i];
+            return item.id === rentalId;
 
-
-        if (rental.id === rentalId) {
-
-            if (rental.status !== "Active") {
-
-                return;
-            }
+        });
 
 
-            rental.status = "Returned";
+    if (!rental) {
 
+        showMessage(
+            "Rental record not found.",
+            "error"
+        );
 
-            const vehicle =
-                findVehicle(rental.vehicleId);
-
-
-            if (vehicle) {
-
-                vehicle.available = true;
-            }
-
-
-            displayVehicles();
-
-            displayRentals();
-
-            updateDashboard();
-
-
-            showMessage(
-                "Vehicle returned successfully.",
-                true
-            );
-
-
-            return;
-        }
+        return;
     }
+
+
+    if (rental.status === "Returned") {
+
+        showMessage(
+            "This vehicle has already been returned.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    rental.status = "Returned";
+
+    rental.returnDate =
+        new Date().toLocaleDateString("en-IN");
+
+
+    saveData();
+
+
+    displayVehicles();
+
+    populateVehicleSelectRefresh();
+
+    displayRentals();
+
+    updateStats();
+
+
+    showMessage(
+        `Vehicle returned successfully. Rental ID: ${rental.id}`,
+        "success"
+    );
+
 }
 
 
-/* =========================================
-   UPDATE DASHBOARD
-========================================= */
+/* =========================
+   STATISTICS
+========================= */
 
-function updateDashboard() {
+function updateStats() {
 
-    let available = 0;
-
-    let active = 0;
-
-
-    for (let i = 0; i < vehicles.length; i++) {
-
-        if (vehicles[i].available) {
-
-            available++;
-        }
-    }
+    const totalVehicles =
+        vehicles.length;
 
 
-    for (let i = 0; i < rentals.length; i++) {
+    const availableVehicles =
+        vehicles.filter(function (vehicle) {
 
-        if (rentals[i].status === "Active") {
+            return !isVehicleRented(vehicle.id);
 
-            active++;
-        }
-    }
-
-
-    document.getElementById("totalVehicles")
-        .innerText = vehicles.length;
+        }).length;
 
 
-    document.getElementById("availableVehicles")
-        .innerText = available;
+    const activeRentals =
+        rentals.filter(function (rental) {
+
+            return rental.status === "Active";
+
+        }).length;
 
 
-    document.getElementById("activeRentals")
-        .innerText = active;
+    const revenue =
+        rentals.reduce(function (sum, rental) {
+
+            return sum + rental.total;
+
+        }, 0);
 
 
-    document.getElementById("totalRevenue")
-        .innerText =
-            "₹" +
-            totalRevenue.toLocaleString("en-IN");
+    document.getElementById(
+        "totalVehicles"
+    ).textContent =
+        totalVehicles;
+
+
+    document.getElementById(
+        "availableVehicles"
+    ).textContent =
+        availableVehicles;
+
+
+    document.getElementById(
+        "activeRentals"
+    ).textContent =
+        activeRentals;
+
+
+    document.getElementById(
+        "totalRevenue"
+    ).textContent =
+        `₹${revenue}`;
+
 }
 
 
-/* =========================================
-   INITIAL LOAD
-========================================= */
+/* =========================
+   SAVE DATA
+========================= */
 
-displayVehicles();
+function saveData() {
 
-displayRentals();
+    localStorage.setItem(
+        "motivoRentals",
+        JSON.stringify(rentals)
+    );
 
-updateDashboard();
+
+    localStorage.setItem(
+        "motivoNextRentalId",
+        nextRentalId
+    );
+
+}
+
+
+/* =========================
+   MESSAGE
+========================= */
+
+function showMessage(text, type) {
+
+    const message =
+        document.getElementById("message");
+
+
+    message.textContent = text;
+
+    message.className =
+        `message ${type}`;
+
+
+    setTimeout(function () {
+
+        message.textContent = "";
+
+        message.className = "message";
+
+    }, 4000);
+
+}
