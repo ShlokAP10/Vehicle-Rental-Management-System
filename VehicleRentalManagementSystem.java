@@ -1,383 +1,360 @@
-```javascript
-// VEHICLES
 
-let vehicles = [
-    {
-        id: 1,
-        name: "Honda City",
-        type: "Car",
-        price: 2500,
-        image: "images/honda-city.jpg",
-        available: true
-    },
-    {
-        id: 2,
-        name: "Maruti Swift",
-        type: "Car",
-        price: 1500,
-        image: "images/maruti-swift.jpg",
-        available: true
-    },
-    {
-        id: 3,
-        name: "Hyundai Creta",
-        type: "SUV",
-        price: 2200,
-        image: "images/hyundai-creta.jpg",
-        available: true
-    },
-    {
-        id: 4,
-        name: "Toyota Fortuner",
-        type: "SUV",
-        price: 4000,
-        image: "images/toyota-fortuner.jpg",
-        available: true
-    },
-    {
-        id: 5,
-        name: "Royal Enfield",
-        type: "Bike",
-        price: 900,
-        image: "images/royal-enfield.jpg",
-        available: true
-    },
-    {
-        id: 6,
-        name: "Yamaha MT-15",
-        type: "Bike",
-        price: 700,
-        image: "images/yamaha-mt15.jpg",
-        available: true
-    }
-];
-
-let rentals = [];
-let filter = "All";
-let rentalId = 1;
+import java.util.ArrayList;
+import java.util.Scanner;
 
 
-// DISPLAY VEHICLES
+// VEHICLE CLASS
+class Vehicle {
 
-function displayVehicles() {
+    int id;
+    String name;
+    String type;
+    double price;
+    boolean available;
 
-    let grid = document.getElementById("vehicleGrid");
-    let search = document.getElementById("searchInput").value.toLowerCase();
-
-    grid.innerHTML = "";
-
-    for (let vehicle of vehicles) {
-
-        if (filter != "All" && vehicle.type != filter)
-            continue;
-
-        if (!vehicle.name.toLowerCase().includes(search))
-            continue;
-
-        grid.innerHTML += `
-            <div class="vehicle-card">
-
-                <div class="vehicle-image">
-                    <img src="${vehicle.image}" alt="${vehicle.name}">
-                </div>
-
-                <div class="vehicle-info">
-
-                    <div class="vehicle-name">
-                        ${vehicle.name}
-                    </div>
-
-                    <div class="vehicle-type">
-                        ${vehicle.type}
-                    </div>
-
-                    <div class="vehicle-price">
-                        ₹${vehicle.price} / day
-                    </div>
-
-                    <div class="vehicle-meta">
-
-                        <span>
-                            ${vehicle.available ? "Available" : "Rented"}
-                        </span>
-
-                        <button
-                            class="vehicle-rent-btn"
-                            onclick="selectVehicle(${vehicle.id})"
-                            ${vehicle.available ? "" : "disabled"}>
-
-                            Rent
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
-        `;
+    Vehicle(int id, String name, String type, double price) {
+        this.id = id;
+        this.name = name;
+        this.type = type;
+        this.price = price;
+        this.available = true;
     }
 
-    updateStats();
-}
-
-
-// FILTER VEHICLES
-
-function setFilter(type, button) {
-
-    filter = type;
-
-    displayVehicles();
-}
-
-
-// SELECT VEHICLE
-
-function selectVehicle(id) {
-
-    document.getElementById("vehicle").value = id;
-
-    calculatePreview();
-
-    document.getElementById("rent").scrollIntoView();
-}
-
-
-// LOAD VEHICLES INTO SELECT BOX
-
-function loadVehicles() {
-
-    let select = document.getElementById("vehicle");
-
-    for (let vehicle of vehicles) {
-
-        let option = document.createElement("option");
-
-        option.value = vehicle.id;
-        option.textContent =
-            vehicle.name + " - ₹" + vehicle.price + "/day";
-
-        select.appendChild(option);
+    void display() {
+        System.out.println(
+            id + " | " + name + " | " + type +
+            " | ₹" + price + " per day | " +
+            (available ? "Available" : "Rented")
+        );
     }
 }
 
 
-// CALCULATE PRICE
+// CUSTOMER CLASS
+class Customer {
 
-function calculatePreview() {
+    String name;
+    String phone;
 
-    let id = document.getElementById("vehicle").value;
-    let days = document.getElementById("days").value;
-
-    let vehicle = vehicles.find(v => v.id == id);
-
-    if (!vehicle) {
-        document.getElementById("summaryVehicle").textContent = "—";
-        document.getElementById("summaryRate").textContent = "₹0";
-        document.getElementById("summaryDays").textContent = "1 day";
-        document.getElementById("previewPrice").textContent = "₹0";
-        return;
-    }
-
-    let total = vehicle.price * days;
-
-    document.getElementById("summaryVehicle").textContent =
-        vehicle.name;
-
-    document.getElementById("summaryRate").textContent =
-        "₹" + vehicle.price;
-
-    document.getElementById("summaryDays").textContent =
-        days + (days == 1 ? " day" : " days");
-
-    document.getElementById("previewPrice").textContent =
-        "₹" + total;
-}
-
-
-// RENT VEHICLE
-
-function rentVehicle() {
-
-    let name = document.getElementById("customer").value;
-    let phone = document.getElementById("phone").value;
-    let vehicleId = document.getElementById("vehicle").value;
-    let days = Number(document.getElementById("days").value);
-    let message = document.getElementById("message");
-
-    if (name == "" || phone == "" || vehicleId == "") {
-
-        message.textContent = "Please fill all details.";
-        return;
-    }
-
-    let vehicle = vehicles.find(v => v.id == vehicleId);
-
-    if (!vehicle.available) {
-
-        message.textContent = "Vehicle is already rented.";
-        return;
-    }
-
-    let total = vehicle.price * days;
-
-    let rental = {
-
-        id: rentalId,
-
-        customer: name,
-
-        phone: phone,
-
-        vehicle: vehicle.name,
-
-        vehicleId: vehicle.id,
-
-        days: days,
-
-        total: total,
-
-        active: true
-    };
-
-    rentals.push(rental);
-
-    rentalId++;
-
-    vehicle.available = false;
-
-    message.textContent = "Rental successful!";
-
-    displayVehicles();
-    displayRentals();
-    calculatePreview();
-
-    document.getElementById("customer").value = "";
-    document.getElementById("phone").value = "";
-    document.getElementById("vehicle").value = "";
-    document.getElementById("days").value = 1;
-}
-
-
-// DISPLAY RENTALS
-
-function displayRentals() {
-
-    let table = document.getElementById("rentalTable");
-
-    table.innerHTML = "";
-
-    if (rentals.length == 0) {
-
-        table.innerHTML = `
-            <tr>
-                <td colspan="7">
-                    No rental records yet.
-                </td>
-            </tr>
-        `;
-
-        return;
-    }
-
-    for (let rental of rentals) {
-
-        table.innerHTML += `
-            <tr>
-
-                <td>${rental.id}</td>
-
-                <td>${rental.customer}</td>
-
-                <td>${rental.vehicle}</td>
-
-                <td>${rental.days}</td>
-
-                <td>₹${rental.total}</td>
-
-                <td>
-                    ${rental.active ? "Active" : "Returned"}
-                </td>
-
-                <td>
-
-                    ${
-                        rental.active
-                        ?
-                        `<button onclick="returnVehicle(${rental.id})">
-                            Return
-                         </button>`
-                        :
-                        "Done"
-                    }
-
-                </td>
-
-            </tr>
-        `;
+    Customer(String name, String phone) {
+        this.name = name;
+        this.phone = phone;
     }
 }
 
 
-// RETURN VEHICLE
+// RENTAL CLASS
+class Rental {
 
-function returnVehicle(id) {
+    int id;
+    Customer customer;
+    Vehicle vehicle;
+    int days;
+    double total;
+    boolean active;
 
-    let rental = rentals.find(r => r.id == id);
+    Rental(int id, Customer customer, Vehicle vehicle, int days) {
 
-    if (!rental)
-        return;
+        this.id = id;
+        this.customer = customer;
+        this.vehicle = vehicle;
+        this.days = days;
 
-    rental.active = false;
+        total = vehicle.price * days;
 
-    let vehicle = vehicles.find(
-        v => v.id == rental.vehicleId
-    );
+        active = true;
 
-    vehicle.available = true;
+        vehicle.available = false;
+    }
 
-    displayVehicles();
-    displayRentals();
-    updateStats();
+    void display() {
+
+        System.out.println(
+            id + " | " +
+            customer.name + " | " +
+            vehicle.name + " | " +
+            days + " days | ₹" +
+            total + " | " +
+            (active ? "Active" : "Returned")
+        );
+    }
 }
 
 
-// UPDATE STATISTICS
+// MAIN CLASS
+public class VehicleRentalManagementSystem {
 
-function updateStats() {
+    static ArrayList<Vehicle> vehicles =
+        new ArrayList<>();
 
-    let available = vehicles.filter(
-        v => v.available
-    ).length;
+    static ArrayList<Customer> customers =
+        new ArrayList<>();
 
-    let active = rentals.filter(
-        r => r.active
-    ).length;
+    static ArrayList<Rental> rentals =
+        new ArrayList<>();
 
-    let revenue = rentals.reduce(
-        (total, r) => total + r.total,
-        0
-    );
+    static Scanner scanner =
+        new Scanner(System.in);
 
-    document.getElementById("totalVehicles").textContent =
-        vehicles.length;
+    static int rentalId = 1;
 
-    document.getElementById("availableVehicles").textContent =
-        available;
 
-    document.getElementById("activeRentals").textContent =
-        active;
+    // ADD VEHICLES
+    static void addVehicles() {
 
-    document.getElementById("totalRevenue").textContent =
-        "₹" + revenue;
+        vehicles.add(
+            new Vehicle(1, "Honda City", "Car", 2500)
+        );
+
+        vehicles.add(
+            new Vehicle(2, "Maruti Swift", "Car", 1500)
+        );
+
+        vehicles.add(
+            new Vehicle(3, "Hyundai Creta", "SUV", 2200)
+        );
+
+        vehicles.add(
+            new Vehicle(4, "Toyota Fortuner", "SUV", 4000)
+        );
+
+        vehicles.add(
+            new Vehicle(5, "Royal Enfield", "Bike", 900)
+        );
+
+        vehicles.add(
+            new Vehicle(6, "Yamaha MT-15", "Bike", 700)
+        );
+    }
+
+
+    // SHOW VEHICLES
+    static void showVehicles() {
+
+        System.out.println("\n--- VEHICLES ---");
+
+        for (Vehicle vehicle : vehicles) {
+            vehicle.display();
+        }
+    }
+
+
+    // FIND VEHICLE
+    static Vehicle findVehicle(int id) {
+
+        for (Vehicle vehicle : vehicles) {
+
+            if (vehicle.id == id) {
+                return vehicle;
+            }
+        }
+
+        return null;
+    }
+
+
+    // RENT VEHICLE
+    static void rentVehicle() {
+
+        scanner.nextLine();
+
+        System.out.print("Customer Name: ");
+        String name = scanner.nextLine();
+
+        System.out.print("Phone Number: ");
+        String phone = scanner.nextLine();
+
+        showVehicles();
+
+        System.out.print("Enter Vehicle ID: ");
+        int vehicleId = scanner.nextInt();
+
+        Vehicle vehicle = findVehicle(vehicleId);
+
+        if (vehicle == null) {
+
+            System.out.println("Vehicle not found.");
+
+            return;
+        }
+
+        if (!vehicle.available) {
+
+            System.out.println("Vehicle is already rented.");
+
+            return;
+        }
+
+        System.out.print("Enter number of days: ");
+        int days = scanner.nextInt();
+
+        if (days <= 0) {
+
+            System.out.println("Invalid number of days.");
+
+            return;
+        }
+
+        Customer customer =
+            new Customer(name, phone);
+
+        customers.add(customer);
+
+        Rental rental =
+            new Rental(
+                rentalId,
+                customer,
+                vehicle,
+                days
+            );
+
+        rentals.add(rental);
+
+        System.out.println(
+            "\nRental successful!"
+        );
+
+        System.out.println(
+            "Rental ID: " + rentalId
+        );
+
+        System.out.println(
+            "Total Amount: ₹" + rental.total
+        );
+
+        rentalId++;
+    }
+
+
+    // RETURN VEHICLE
+    static void returnVehicle() {
+
+        System.out.print("Enter Rental ID: ");
+        int id = scanner.nextInt();
+
+        for (Rental rental : rentals) {
+
+            if (rental.id == id) {
+
+                if (!rental.active) {
+
+                    System.out.println(
+                        "Vehicle already returned."
+                    );
+
+                    return;
+                }
+
+                rental.active = false;
+                rental.vehicle.available = true;
+
+                System.out.println(
+                    "Vehicle returned successfully."
+                );
+
+                return;
+            }
+        }
+
+        System.out.println(
+            "Rental not found."
+        );
+    }
+
+
+    // SHOW RENTALS
+    static void showRentals() {
+
+        System.out.println("\n--- RENTAL RECORDS ---");
+
+        if (rentals.size() == 0) {
+
+            System.out.println(
+                "No rental records."
+            );
+
+            return;
+        }
+
+        for (Rental rental : rentals) {
+            rental.display();
+        }
+    }
+
+
+    // MAIN METHOD
+    public static void main(String[] args) {
+
+        addVehicles();
+
+        int choice;
+
+        do {
+
+            System.out.println(
+                "\n===== VEHICLE RENTAL SYSTEM ====="
+            );
+
+            System.out.println(
+                "1. Show Vehicles"
+            );
+
+            System.out.println(
+                "2. Rent Vehicle"
+            );
+
+            System.out.println(
+                "3. Return Vehicle"
+            );
+
+            System.out.println(
+                "4. Show Rentals"
+            );
+
+            System.out.println(
+                "5. Exit"
+            );
+
+            System.out.print(
+                "Enter choice: "
+            );
+
+            choice = scanner.nextInt();
+
+
+            switch (choice) {
+
+                case 1:
+                    showVehicles();
+                    break;
+
+                case 2:
+                    rentVehicle();
+                    break;
+
+                case 3:
+                    returnVehicle();
+                    break;
+
+                case 4:
+                    showRentals();
+                    break;
+
+                case 5:
+                    System.out.println(
+                        "Thank you!"
+                    );
+                    break;
+
+                default:
+                    System.out.println(
+                        "Invalid choice."
+                    );
+            }
+
+        } while (choice != 5);
+
+        scanner.close();
+    }
 }
-
-
-// START WEBSITE
-
-loadVehicles();
-displayVehicles();
-displayRentals();
-updateStats();
 ```
