@@ -1,293 +1,242 @@
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
 
-// VEHICLE CLASS
+
+
 class Vehicle {
 
-    int id;
-    String name;
-    String type;
-    double price;
-    boolean available;
+    private int id;
+    private String name;
+    private String type;
+    private String number;
+    private double pricePerDay;
+    private boolean available;
 
-    Vehicle(int id, String name, String type, double price) {
+
+    Vehicle(
+        int id,
+        String name,
+        String type,
+        String number,
+        double pricePerDay
+    ) {
+
         this.id = id;
         this.name = name;
         this.type = type;
-        this.price = price;
-        this.available = true;
+        this.number = number;
+        this.pricePerDay = pricePerDay;
+
+        available = true;
     }
 
-    void display() {
-        System.out.println(
-            id + " | " + name + " | " + type +
-            " | ₹" + price + " per day | " +
-            (available ? "Available" : "Rented")
-        );
+
+    int getId() {
+        return id;
     }
-}
 
 
-// CUSTOMER CLASS
-class Customer {
-
-    String name;
-    String phone;
-
-    Customer(String name, String phone) {
-        this.name = name;
-        this.phone = phone;
+    String getName() {
+        return name;
     }
-}
 
 
-// RENTAL CLASS
-class Rental {
-
-    int id;
-    Customer customer;
-    Vehicle vehicle;
-    int days;
-    double total;
-    boolean active;
-
-    Rental(int id, Customer customer, Vehicle vehicle, int days) {
-
-        this.id = id;
-        this.customer = customer;
-        this.vehicle = vehicle;
-        this.days = days;
-
-        total = vehicle.price * days;
-
-        active = true;
-
-        vehicle.available = false;
+    double getPricePerDay() {
+        return pricePerDay;
     }
+
+
+    boolean isAvailable() {
+        return available;
+    }
+
+
+    void setAvailable(boolean available) {
+        this.available = available;
+    }
+
 
     void display() {
 
         System.out.println(
             id + " | " +
-            customer.name + " | " +
-            vehicle.name + " | " +
-            days + " days | ₹" +
-            total + " | " +
-            (active ? "Active" : "Returned")
+            name + " | " +
+            type + " | " +
+            number + " | ₹" +
+            pricePerDay + " | " +
+            (available ? "Available" : "Rented")
         );
+
     }
+
 }
 
 
-// MAIN CLASS
+/* =========================
+   CUSTOMER CLASS
+========================= */
+
+class Customer {
+
+    private int id;
+    private String name;
+    private String phone;
+
+
+    Customer(
+        int id,
+        String name,
+        String phone
+    ) {
+
+        this.id = id;
+        this.name = name;
+        this.phone = phone;
+
+    }
+
+
+    int getId() {
+        return id;
+    }
+
+
+    void display() {
+
+        System.out.println(
+            id + " | " +
+            name + " | " +
+            phone
+        );
+
+    }
+
+}
+
+
+/* =========================
+   RENTAL CLASS
+========================= */
+
+class Rental {
+
+    private int id;
+
+    private Customer customer;
+
+    private Vehicle vehicle;
+
+    private int days;
+
+    private double total;
+
+    private boolean active;
+
+
+    Rental(
+        int id,
+        Customer customer,
+        Vehicle vehicle,
+        int days
+    ) {
+
+        this.id = id;
+
+        this.customer = customer;
+
+        this.vehicle = vehicle;
+
+        this.days = days;
+
+        total =
+            vehicle.getPricePerDay()
+            * days;
+
+        active = true;
+
+    }
+
+
+    int getId() {
+        return id;
+    }
+
+
+    boolean isActive() {
+        return active;
+    }
+
+
+    void returnVehicle() {
+
+        active = false;
+
+        vehicle.setAvailable(true);
+
+    }
+
+
+    void display() {
+
+        System.out.println(
+
+            "Rental ID: " + id +
+
+            " | Customer ID: " +
+            customer.getId() +
+
+            " | Vehicle: " +
+            vehicle.getName() +
+
+            " | Days: " +
+            days +
+
+            " | Total: ₹" +
+            total +
+
+            " | Status: " +
+
+            (active
+                ? "Active"
+                : "Returned")
+
+        );
+
+    }
+
+}
+
+
+
 public class VehicleRentalManagementSystem {
-
-    static ArrayList<Vehicle> vehicles =
-        new ArrayList<>();
-
-    static ArrayList<Customer> customers =
-        new ArrayList<>();
-
-    static ArrayList<Rental> rentals =
-        new ArrayList<>();
 
     static Scanner scanner =
         new Scanner(System.in);
 
-    static int rentalId = 1;
 
+    static ArrayList<Vehicle> vehicles =
+        new ArrayList<>();
 
-    // ADD VEHICLES
-    static void addVehicles() {
 
-        vehicles.add(
-            new Vehicle(1, "Honda City", "Car", 2500)
-        );
+    static ArrayList<Customer> customers =
+        new ArrayList<>();
 
-        vehicles.add(
-            new Vehicle(2, "Maruti Swift", "Car", 1500)
-        );
 
-        vehicles.add(
-            new Vehicle(3, "Hyundai Creta", "SUV", 2200)
-        );
+    static ArrayList<Rental> rentals =
+        new ArrayList<>();
 
-        vehicles.add(
-            new Vehicle(4, "Toyota Fortuner", "SUV", 4000)
-        );
 
-        vehicles.add(
-            new Vehicle(5, "Royal Enfield", "Bike", 900)
-        );
+    static int nextRentalId = 1001;
 
-        vehicles.add(
-            new Vehicle(6, "Yamaha MT-15", "Bike", 700)
-        );
-    }
 
-
-    // SHOW VEHICLES
-    static void showVehicles() {
-
-        System.out.println("\n--- VEHICLES ---");
-
-        for (Vehicle vehicle : vehicles) {
-            vehicle.display();
-        }
-    }
-
-
-    // FIND VEHICLE
-    static Vehicle findVehicle(int id) {
-
-        for (Vehicle vehicle : vehicles) {
-
-            if (vehicle.id == id) {
-                return vehicle;
-            }
-        }
-
-        return null;
-    }
-
-
-    // RENT VEHICLE
-    static void rentVehicle() {
-
-        scanner.nextLine();
-
-        System.out.print("Customer Name: ");
-        String name = scanner.nextLine();
-
-        System.out.print("Phone Number: ");
-        String phone = scanner.nextLine();
-
-        showVehicles();
-
-        System.out.print("Enter Vehicle ID: ");
-        int vehicleId = scanner.nextInt();
-
-        Vehicle vehicle = findVehicle(vehicleId);
-
-        if (vehicle == null) {
-
-            System.out.println("Vehicle not found.");
-
-            return;
-        }
-
-        if (!vehicle.available) {
-
-            System.out.println("Vehicle is already rented.");
-
-            return;
-        }
-
-        System.out.print("Enter number of days: ");
-        int days = scanner.nextInt();
-
-        if (days <= 0) {
-
-            System.out.println("Invalid number of days.");
-
-            return;
-        }
-
-        Customer customer =
-            new Customer(name, phone);
-
-        customers.add(customer);
-
-        Rental rental =
-            new Rental(
-                rentalId,
-                customer,
-                vehicle,
-                days
-            );
-
-        rentals.add(rental);
-
-        System.out.println(
-            "\nRental successful!"
-        );
-
-        System.out.println(
-            "Rental ID: " + rentalId
-        );
-
-        System.out.println(
-            "Total Amount: ₹" + rental.total
-        );
-
-        rentalId++;
-    }
-
-
-    // RETURN VEHICLE
-    static void returnVehicle() {
-
-        System.out.print("Enter Rental ID: ");
-        int id = scanner.nextInt();
-
-        for (Rental rental : rentals) {
-
-            if (rental.id == id) {
-
-                if (!rental.active) {
-
-                    System.out.println(
-                        "Vehicle already returned."
-                    );
-
-                    return;
-                }
-
-                rental.active = false;
-                rental.vehicle.available = true;
-
-                System.out.println(
-                    "Vehicle returned successfully."
-                );
-
-                return;
-            }
-        }
-
-        System.out.println(
-            "Rental not found."
-        );
-    }
-
-
-    // SHOW RENTALS
-    static void showRentals() {
-
-        System.out.println("\n--- RENTAL RECORDS ---");
-
-        if (rentals.size() == 0) {
-
-            System.out.println(
-                "No rental records."
-            );
-
-            return;
-        }
-
-        for (Rental rental : rentals) {
-            rental.display();
-        }
-    }
-
-
-    // MAIN METHOD
     public static void main(String[] args) {
 
         addVehicles();
 
+
         int choice;
+
 
         do {
 
@@ -295,66 +244,555 @@ public class VehicleRentalManagementSystem {
                 "\n===== VEHICLE RENTAL SYSTEM ====="
             );
 
-            System.out.println(
-                "1. Show Vehicles"
-            );
 
             System.out.println(
-                "2. Rent Vehicle"
+                "1. Display Vehicles"
             );
 
-            System.out.println(
-                "3. Return Vehicle"
-            );
 
             System.out.println(
-                "4. Show Rentals"
+                "2. Add Customer"
             );
 
+
             System.out.println(
-                "5. Exit"
+                "3. Display Customers"
             );
+
+
+            System.out.println(
+                "4. Rent Vehicle"
+            );
+
+
+            System.out.println(
+                "5. Return Vehicle"
+            );
+
+
+            System.out.println(
+                "6. Display Rentals"
+            );
+
+
+            System.out.println(
+                "7. Exit"
+            );
+
 
             System.out.print(
                 "Enter choice: "
             );
 
-            choice = scanner.nextInt();
+
+            choice =
+                scanner.nextInt();
 
 
-            switch (choice) {
+            if (choice == 1) {
 
-                case 1:
-                    showVehicles();
-                    break;
+                displayVehicles();
 
-                case 2:
-                    rentVehicle();
-                    break;
-
-                case 3:
-                    returnVehicle();
-                    break;
-
-                case 4:
-                    showRentals();
-                    break;
-
-                case 5:
-                    System.out.println(
-                        "Thank you!"
-                    );
-                    break;
-
-                default:
-                    System.out.println(
-                        "Invalid choice."
-                    );
             }
 
-        } while (choice != 5);
+            else if (choice == 2) {
+
+                addCustomer();
+
+            }
+
+            else if (choice == 3) {
+
+                displayCustomers();
+
+            }
+
+            else if (choice == 4) {
+
+                rentVehicle();
+
+            }
+
+            else if (choice == 5) {
+
+                returnVehicle();
+
+            }
+
+            else if (choice == 6) {
+
+                displayRentals();
+
+            }
+
+            else if (choice == 7) {
+
+                System.out.println(
+                    "Thank you."
+                );
+
+            }
+
+            else {
+
+                System.out.println(
+                    "Invalid choice."
+                );
+
+            }
+
+
+        } while (choice != 7);
+
 
         scanner.close();
+
     }
+
+
+    /* =========================
+       ADD VEHICLES
+    ========================= */
+
+    static void addVehicles() {
+
+        vehicles.add(
+            new Vehicle(
+                101,
+                "Honda City",
+                "Car",
+                "MH01AB1234",
+                2500
+            )
+        );
+
+
+        vehicles.add(
+            new Vehicle(
+                102,
+                "Maruti Swift",
+                "Car",
+                "MH02CD5678",
+                1500
+            )
+        );
+
+
+        vehicles.add(
+            new Vehicle(
+                103,
+                "Hyundai Creta",
+                "SUV",
+                "MH03EF9012",
+                2200
+            )
+        );
+
+
+        vehicles.add(
+            new Vehicle(
+                104,
+                "Toyota Fortuner",
+                "SUV",
+                "MH04GH3456",
+                4000
+            )
+        );
+
+
+        vehicles.add(
+            new Vehicle(
+                105,
+                "Royal Enfield",
+                "Bike",
+                "MH05IJ7890",
+                900
+            )
+        );
+
+
+        vehicles.add(
+            new Vehicle(
+                106,
+                "Yamaha MT-15",
+                "Bike",
+                "MH06KL1234",
+                700
+            )
+        );
+
+    }
+
+
+    /* =========================
+       DISPLAY VEHICLES
+    ========================= */
+
+    static void displayVehicles() {
+
+        System.out.println(
+            "\nID | Name | Type | Number | Rate | Status"
+        );
+
+
+        System.out.println(
+            "------------------------------------------------------"
+        );
+
+
+        for (Vehicle vehicle : vehicles) {
+
+            vehicle.display();
+
+        }
+
+    }
+
+
+    /* =========================
+       FIND VEHICLE
+    ========================= */
+
+    static Vehicle findVehicle(int id) {
+
+        for (Vehicle vehicle : vehicles) {
+
+            if (vehicle.getId() == id) {
+
+                return vehicle;
+
+            }
+
+        }
+
+
+        return null;
+
+    }
+
+
+    /* =========================
+       ADD CUSTOMER
+    ========================= */
+
+    static void addCustomer() {
+
+        System.out.print(
+            "\nEnter customer ID: "
+        );
+
+        int id =
+            scanner.nextInt();
+
+
+        scanner.nextLine();
+
+
+        System.out.print(
+            "Enter customer name: "
+        );
+
+        String name =
+            scanner.nextLine();
+
+
+        System.out.print(
+            "Enter phone number: "
+        );
+
+        String phone =
+            scanner.nextLine();
+
+
+        customers.add(
+            new Customer(
+                id,
+                name,
+                phone
+            )
+        );
+
+
+        System.out.println(
+            "Customer added successfully."
+        );
+
+    }
+
+
+    /* =========================
+       DISPLAY CUSTOMERS
+    ========================= */
+
+    static void displayCustomers() {
+
+        if (customers.size() == 0) {
+
+            System.out.println(
+                "\nNo customers found."
+            );
+
+            return;
+
+        }
+
+
+        System.out.println(
+            "\nID | Name | Phone"
+        );
+
+
+        System.out.println(
+            "---------------------------"
+        );
+
+
+        for (Customer customer : customers) {
+
+            customer.display();
+
+        }
+
+    }
+
+
+    /* =========================
+       FIND CUSTOMER
+    ========================= */
+
+    static Customer findCustomer(int id) {
+
+        for (Customer customer : customers) {
+
+            if (customer.getId() == id) {
+
+                return customer;
+
+            }
+
+        }
+
+
+        return null;
+
+    }
+
+
+    /* =========================
+       RENT VEHICLE
+    ========================= */
+
+    static void rentVehicle() {
+
+        System.out.print(
+            "\nEnter customer ID: "
+        );
+
+        int customerId =
+            scanner.nextInt();
+
+
+        Customer customer =
+            findCustomer(customerId);
+
+
+        if (customer == null) {
+
+            System.out.println(
+                "Customer not found."
+            );
+
+            return;
+
+        }
+
+
+        displayVehicles();
+
+
+        System.out.print(
+            "\nEnter vehicle ID: "
+        );
+
+        int vehicleId =
+            scanner.nextInt();
+
+
+        Vehicle vehicle =
+            findVehicle(vehicleId);
+
+
+        if (vehicle == null) {
+
+            System.out.println(
+                "Vehicle not found."
+            );
+
+            return;
+
+        }
+
+
+        if (!vehicle.isAvailable()) {
+
+            System.out.println(
+                "Vehicle is already rented."
+            );
+
+            return;
+
+        }
+
+
+        System.out.print(
+            "Enter number of days: "
+        );
+
+        int days =
+            scanner.nextInt();
+
+
+        if (days <= 0) {
+
+            System.out.println(
+                "Days must be greater than zero."
+            );
+
+            return;
+
+        }
+
+
+        if (days > 30) {
+
+            System.out.println(
+                "Maximum rental period is 30 days."
+            );
+
+            return;
+
+        }
+
+
+        Rental rental =
+            new Rental(
+                nextRentalId,
+                customer,
+                vehicle,
+                days
+            );
+
+
+        rentals.add(rental);
+
+
+        nextRentalId++;
+
+
+        vehicle.setAvailable(false);
+
+
+        System.out.println(
+            "\nRental created successfully."
+        );
+
+
+        rental.display();
+
+    }
+
+
+    /* =========================
+       RETURN VEHICLE
+    ========================= */
+
+    static void returnVehicle() {
+
+        if (rentals.size() == 0) {
+
+            System.out.println(
+                "\nNo rentals found."
+            );
+
+            return;
+
+        }
+
+
+        System.out.print(
+            "\nEnter rental ID: "
+        );
+
+
+        int rentalId =
+            scanner.nextInt();
+
+
+        for (Rental rental : rentals) {
+
+            if (rental.getId() == rentalId) {
+
+                if (!rental.isActive()) {
+
+                    System.out.println(
+                        "Vehicle has already been returned."
+                    );
+
+                    return;
+
+                }
+
+
+                rental.returnVehicle();
+
+
+                System.out.println(
+                    "Vehicle returned successfully."
+                );
+
+
+                return;
+
+            }
+
+        }
+
+
+        System.out.println(
+            "Rental ID not found."
+        );
+
+    }
+
+
+    /* =========================
+       DISPLAY RENTALS
+    ========================= */
+
+    static void displayRentals() {
+
+        if (rentals.size() == 0) {
+
+            System.out.println(
+                "\nNo rental records found."
+            );
+
+            return;
+
+        }
+
+
+        System.out.println(
+            "\n===== RENTAL RECORDS ====="
+        );
+
+
+        for (Rental rental : rentals) {
+
+            rental.display();
+
+        }
+
+    }
+
 }
-```
